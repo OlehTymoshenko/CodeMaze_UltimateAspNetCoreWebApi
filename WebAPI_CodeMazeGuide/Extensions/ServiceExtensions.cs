@@ -1,11 +1,13 @@
 ﻿using Contracts;
 using Entities;
+using Entities.DTOs;
 using LoggerService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repository;
+using Repository.DataShaping;
 using System;
 using System.Reflection;
 using WebAPI_CodeMazeGuide.ActionFilters;
@@ -55,11 +57,15 @@ namespace WebAPI_CodeMazeGuide.Extensions
             return services;
         }
 
+        public static IServiceCollection ConfigureDataShaper(this IServiceCollection services) =>
+            services.AddScoped<IDataShaper<EmployeeDTO>, DataShaper<EmployeeDTO>>();
+
         public static IMvcBuilder ConfigureOutputCSVFormatter(this IMvcBuilder mvcBuilder) =>
             mvcBuilder.AddMvcOptions(opt =>
             {
                 opt.OutputFormatters.Add(new CsvOutputFormatter());
             });
+
 
     }
 }

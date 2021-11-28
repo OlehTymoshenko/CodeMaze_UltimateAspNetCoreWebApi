@@ -32,6 +32,7 @@ namespace WebAPI_CodeMazeGuide
             services.ConfigureSqlContext(Configuration);
             services.ConfigureRepositoryManager();
             services.ConfigureCustomActionFilters();
+            services.ConfigureDataShaper();
             services.AddAutoMapper(typeof(Startup));
 
             services.AddControllers(opt =>
