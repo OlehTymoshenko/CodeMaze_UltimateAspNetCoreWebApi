@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
+using Entities.Models;
 
 namespace Repository.DataShaping
 {
@@ -18,16 +19,16 @@ namespace Repository.DataShaping
         }
 
 
-        public ExpandoObject ShapeData(T entity, string reqiredPropertiesString)
+        public ShapedEntity ShapeData(T entity, string reqiredPropertiesString)
         {
             var requiredProperties = GetRequiredProperties(reqiredPropertiesString);
 
             return FetchData(entity, requiredProperties);
         }
 
-        public IEnumerable<ExpandoObject> ShapeData(IEnumerable<T> entities, string reqiredPropertiesString)
+        public IEnumerable<ShapedEntity> ShapeData(IEnumerable<T> entities, string reqiredPropertiesString)
         {
-            List<ExpandoObject> shapedEntities = new();
+            List<ShapedEntity> shapedEntities = new();
             
             var requiredProperties = GetRequiredProperties(reqiredPropertiesString);
 
@@ -62,15 +63,18 @@ namespace Repository.DataShaping
             return requiredProperties;
         }
 
-        private ExpandoObject FetchData(T entity, IEnumerable<PropertyInfo> requiredProperties)
+        private ShapedEntity FetchData(T entity, IEnumerable<PropertyInfo> requiredProperties)
         {
-            ExpandoObject shapedEntity = new();
+            ShapedEntity shapedEntity = new();
 
             foreach (var property in requiredProperties)
             {
                 var propertyValue = property.GetValue(entity);
-                shapedEntity.TryAdd(property.Name, propertyValue);
+                shapedEntity.Entity.TryAdd(property.Name, propertyValue);
             }
+
+            var idProperty = entity.GetType().GetProperty("Id");
+            shapedEntity.Id = (Guid)idProperty.GetValue(entity);
 
             return shapedEntity;
         }

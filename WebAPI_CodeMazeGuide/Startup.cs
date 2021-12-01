@@ -8,6 +8,7 @@ using NLog;
 using System.IO;
 using WebAPI_CodeMazeGuide.ActionFilters;
 using WebAPI_CodeMazeGuide.Extensions;
+using WebAPI_CodeMazeGuide.Utility;
 
 namespace WebAPI_CodeMazeGuide
 {
@@ -34,6 +35,7 @@ namespace WebAPI_CodeMazeGuide
             services.ConfigureCustomActionFilters();
             services.ConfigureDataShaper();
             services.AddAutoMapper(typeof(Startup));
+            services.AddScoped<EmployeeLinks>();
 
             services.AddControllers(opt =>
             {
@@ -42,6 +44,7 @@ namespace WebAPI_CodeMazeGuide
                 opt.SuppressAsyncSuffixInActionNames = false;
             }).AddNewtonsoftJson()
               .AddXmlDataContractSerializerFormatters()
+              .AddCustomMediaTypes()
               .ConfigureOutputCSVFormatter()
               .ConfigureApiBehaviorOptions(opt =>
               {

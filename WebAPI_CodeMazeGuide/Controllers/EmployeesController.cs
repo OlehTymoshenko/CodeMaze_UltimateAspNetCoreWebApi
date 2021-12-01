@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using WebAPI_CodeMazeGuide.ActionFilters;
 using Entities.RequestFeatures;
 using System.Text.Json;
+using WebAPI_CodeMazeGuide.Utility;
 
 namespace WebAPI_CodeMazeGuide.Controllers
 {
@@ -20,20 +21,16 @@ namespace WebAPI_CodeMazeGuide.Controllers
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
-        private readonly IDataShaper<EmployeeDTO> _dataShaper;
+        private readonly EmployeeLinks _employeeLinks;
 
         public EmployeesController(IRepositoryManager repository,
             ILoggerManager logger,
             IMapper mapper, 
-            IDataShaper<EmployeeDTO> dataShaper)
-        {
-            _repository = repository;
-            _logger = logger;
-            _mapper = mapper;
-            _dataShaper = dataShaper;
-        }
+            EmployeeLinks employeeLinks) => 
+            (_repository, _logger, _mapper, _employeeLinks) = (repository, logger, mapper, employeeLinks);
 
         [HttpGet]
+        [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         public async Task<IActionResult> GetEmployeesForCompanyAsync(Guid companyId, 
             [FromQuery] EmployeeParameters employeeParameters)
         {
@@ -58,9 +55,12 @@ namespace WebAPI_CodeMazeGuide.Controllers
 
             var employeesDto = _mapper.Map<IEnumerable<EmployeeDTO>>(employees);
 
-            var shapedEmployeesDto = _dataShaper.ShapeData(employeesDto, employeeParameters.Fields);
+            var links = _employeeLinks.TryGenerateLinks(employeesDto, employeeParameters.Fields,
+                companyId, HttpContext);
 
-            return Ok(shapedEmployeesDto);
+
+
+            return links.HasLinks ? Ok(links.LinkedEntities) : Ok(links.ShapedEntities);
         }
 
         [HttpGet("{id}")]

@@ -3,12 +3,15 @@ using Entities;
 using Entities.DTOs;
 using LoggerService;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repository;
 using Repository.DataShaping;
 using System;
+using System.Linq;
 using System.Reflection;
 using WebAPI_CodeMazeGuide.ActionFilters;
 using WebAPI_CodeMazeGuide.CustomInOutFormatters;
@@ -54,6 +57,7 @@ namespace WebAPI_CodeMazeGuide.Extensions
             services.AddScoped<ValidationFilterAttribute>();
             services.AddScoped<ValidateCompanyExistsActionFilterAttribute>();
             services.AddScoped<ValitedateEmployeeForCompanyExistsActionFilterAttribute>();
+            services.AddScoped<ValidateMediaTypeAttribute>();
             return services;
         }
 
@@ -66,6 +70,35 @@ namespace WebAPI_CodeMazeGuide.Extensions
                 opt.OutputFormatters.Add(new CsvOutputFormatter());
             });
 
+        public static IMvcBuilder AddCustomMediaTypes(this IMvcBuilder mvcBuilder)
+        {
+            mvcBuilder.AddMvcOptions(opt => 
+            {
+                var newtonsoftJsonOutputFormatter = opt.OutputFormatters.
+                    OfType<NewtonsoftJsonOutputFormatter>()
+                    ?.FirstOrDefault();
+
+                if(newtonsoftJsonOutputFormatter is not null)
+                {
+                    newtonsoftJsonOutputFormatter
+                        .SupportedMediaTypes
+                        .Add("application/vnd.olehtymoshenko.hateoas+json");
+                }
+
+                var xmlOutputFormatter = opt.OutputFormatters.
+                    OfType<XmlDataContractSerializerOutputFormatter>()
+                    ?.FirstOrDefault();
+
+                if (xmlOutputFormatter is not null)
+                {
+                    xmlOutputFormatter
+                        .SupportedMediaTypes
+                        .Add("application/vnd.olehtymoshenko.hateoas+xml");
+                }
+            });
+
+            return mvcBuilder;
+        }
 
     }
 }
