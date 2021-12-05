@@ -30,7 +30,7 @@ namespace WebAPI_CodeMazeGuide.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet(Name ="GetCompanies")]
         public async Task<IActionResult> GetCompaniesAsync()
         {
             var companies = await _repository.Companies.GetAllCompaniesAsync(false);
@@ -79,7 +79,7 @@ namespace WebAPI_CodeMazeGuide.Controllers
             return Ok(companiesDto);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateCompany")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateCompanyAsync(CompanyForCreationDTO companyCreationDto)    
         {
@@ -145,6 +145,14 @@ namespace WebAPI_CodeMazeGuide.Controllers
             await _repository.SaveAsync();
 
             return NoContent();
+        }
+
+        [HttpOptions]
+        public IActionResult Options()
+        {
+            Response.Headers.Add("Allow", "GET, POST, PUT, DELETE, OPTIONS");
+
+            return Ok();
         }
     }
 }

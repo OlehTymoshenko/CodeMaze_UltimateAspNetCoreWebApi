@@ -88,7 +88,7 @@ namespace WebAPI_CodeMazeGuide.Utility
             {
                 Href = _linkGenerator.GetUriByAction(httpContext, "GetEmployeesForCompanyAsync"),
                 Rel = "self",
-                Method = HttpMethod.Get
+                Method = HttpMethod.Get.Method
             });
 
             return employeeCollection;
@@ -103,27 +103,27 @@ namespace WebAPI_CodeMazeGuide.Utility
                     Href = _linkGenerator.GetUriByAction(httpContext, "GetEmployeeByIdAsync",
                         values: new { companyId, id, fields }),
                     Rel = "self",
-                    Method = HttpMethod.Get
+                    Method = HttpMethod.Get.Method
                 },
                 new Link
                 {
                     Href = _linkGenerator.GetUriByAction(httpContext, "DeleteEmployeeAsync"),
                     Rel = "delete_employee",
-                    Method = HttpMethod.Delete
+                    Method = HttpMethod.Delete.Method
                 },
                 new Link
                 {
                     Href = _linkGenerator.GetUriByAction(httpContext, "UpdateAsync",
                         values: new { companyId, id }),
                     Rel = "update_employee",
-                    Method = HttpMethod.Put
+                    Method = HttpMethod.Put.Method
                 },
                 new Link
                 {
                     Href = _linkGenerator.GetUriByAction(httpContext, "PatchAsync",
                         values: new { companyId, id }),
                     Rel = "partially_update_employee",
-                    Method = HttpMethod.Patch
+                    Method = HttpMethod.Patch.Method
                 }
             };
 

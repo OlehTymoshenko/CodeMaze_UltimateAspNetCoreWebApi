@@ -30,6 +30,7 @@ namespace WebAPI_CodeMazeGuide.Controllers
             (_repository, _logger, _mapper, _employeeLinks) = (repository, logger, mapper, employeeLinks);
 
         [HttpGet]
+        [HttpHead]
         [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         public async Task<IActionResult> GetEmployeesForCompanyAsync(Guid companyId, 
             [FromQuery] EmployeeParameters employeeParameters)

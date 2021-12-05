@@ -83,6 +83,9 @@ namespace WebAPI_CodeMazeGuide.Extensions
                     newtonsoftJsonOutputFormatter
                         .SupportedMediaTypes
                         .Add("application/vnd.olehtymoshenko.hateoas+json");
+                    newtonsoftJsonOutputFormatter
+                        .SupportedMediaTypes
+                        .Add("application/vnd.olehtymoshenko.apiroot+json");
                 }
 
                 var xmlOutputFormatter = opt.OutputFormatters.
@@ -94,6 +97,9 @@ namespace WebAPI_CodeMazeGuide.Extensions
                     xmlOutputFormatter
                         .SupportedMediaTypes
                         .Add("application/vnd.olehtymoshenko.hateoas+xml");
+                    xmlOutputFormatter
+                        .SupportedMediaTypes
+                        .Add("application/vnd.olehtymoshenko.apiroot+xml");
                 }
             });
 

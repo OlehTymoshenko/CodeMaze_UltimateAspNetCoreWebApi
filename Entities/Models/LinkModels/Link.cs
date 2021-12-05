@@ -11,7 +11,7 @@ namespace Entities.Models.LinkModels
     {
         public string Href { get; init; }
         public string Rel { get; init; }
-        public HttpMethod Method { get; init; }
+        public string Method { get; init; }
 
         // for xml serialization
         public Link() { }
