@@ -13,6 +13,7 @@ using WebAPI_CodeMazeGuide.ModelBinders;
 
 namespace WebAPI_CodeMazeGuide.Controllers
 {
+    [ApiVersion("1.0")]
     [Route("api/companies")]
     [ApiController]
     public class CompaniesController : ControllerBase

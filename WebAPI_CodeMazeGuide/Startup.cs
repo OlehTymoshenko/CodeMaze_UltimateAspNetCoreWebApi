@@ -34,9 +34,9 @@ namespace WebAPI_CodeMazeGuide
             services.ConfigureRepositoryManager();
             services.ConfigureCustomActionFilters();
             services.ConfigureDataShaper();
+            services.ConfigureVersioning();
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<EmployeeLinks>();
-
             services.AddControllers(opt =>
             {
                 opt.RespectBrowserAcceptHeader = true;
