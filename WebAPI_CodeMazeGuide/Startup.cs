@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,6 +36,11 @@ namespace WebAPI_CodeMazeGuide
             services.ConfigureCustomActionFilters();
             services.ConfigureDataShaper();
             services.ConfigureVersioning();
+            services.ConfigureResponseCaching();
+            services.ConfigureHtttpCachingHeaders();
+            services.AddMemoryCache();
+            services.ConfigureRateLimitingOptions();
+            services.AddHttpContextAccessor();
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<EmployeeLinks>();
             services.AddControllers(opt =>
@@ -42,6 +48,10 @@ namespace WebAPI_CodeMazeGuide
                 opt.RespectBrowserAcceptHeader = true;
                 opt.ReturnHttpNotAcceptable = true;
                 opt.SuppressAsyncSuffixInActionNames = false;
+                /*opt.CacheProfiles.Add("120SecondsDuration", new Microsoft.AspNetCore.Mvc.CacheProfile
+                {
+                    Duration = 120
+                });*/
             }).AddNewtonsoftJson()
               .AddXmlDataContractSerializerFormatters()
               .AddCustomMediaTypes()
@@ -71,8 +81,12 @@ namespace WebAPI_CodeMazeGuide
                 ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All
             });
 
+            app.UseIpRateLimiting();
 
             app.UseRouting();
+
+            app.UseResponseCaching();
+            app.UseHttpCacheHeaders();
 
             app.UseAuthorization();
 

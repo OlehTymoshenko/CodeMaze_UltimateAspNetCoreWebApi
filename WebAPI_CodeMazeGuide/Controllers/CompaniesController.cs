@@ -7,7 +7,10 @@ using AutoMapper;
 using Contracts;
 using Entities.DTOs;
 using Entities.Models;
+using Marvin.Cache.Headers;
+using Marvin.Cache.Headers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.ResponseCaching;
 using WebAPI_CodeMazeGuide.ActionFilters;
 using WebAPI_CodeMazeGuide.ModelBinders;
 
@@ -15,20 +18,29 @@ namespace WebAPI_CodeMazeGuide.Controllers
 {
     [ApiVersion("1.0")]
     [Route("api/companies")]
+    // [ResponseCache(CacheProfileName = "120SecondsDuration")]
     [ApiController]
     public class CompaniesController : ControllerBase
     {
         private readonly ILoggerManager _logger;
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
+        private readonly IValidatorValueInvalidator validatorValueInvalidator;
+        private readonly IStoreKeyAccessor storeKeyAccessor;
 
         public CompaniesController(ILoggerManager loggerManager,
             IRepositoryManager repositoryManager,
-            IMapper mapper)
+            IMapper mapper,
+            IValidatorValueInvalidator validatorValueInvalidator,
+            IStoreKeyAccessor storeKeyAccessor)
         {
             _logger = loggerManager;
             _repository = repositoryManager;
             _mapper = mapper;
+            this.validatorValueInvalidator = validatorValueInvalidator;
+            this.storeKeyAccessor = storeKeyAccessor;
+            //
+
         }
 
         [HttpGet(Name ="GetCompanies")]
@@ -42,6 +54,9 @@ namespace WebAPI_CodeMazeGuide.Controllers
         }
 
         [HttpGet("{id}", Name = "CompanyById")]
+        // [ResponseCache(Duration = 60)]
+        [HttpCacheExpiration(MaxAge = 300, CacheLocation = CacheLocation.Public)]
+        [HttpCacheValidation(MustRevalidate = false)]
         public async Task<IActionResult> GetComapanyByIdAsync(Guid id)
         {
             var company = await _repository.Companies.GetByIdAsync(id, false);

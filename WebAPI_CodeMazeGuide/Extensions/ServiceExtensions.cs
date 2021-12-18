@@ -14,8 +14,10 @@ using Repository.DataShaping;
 using System;
 using System.Linq;
 using System.Reflection;
+using AspNetCoreRateLimit;
 using WebAPI_CodeMazeGuide.ActionFilters;
 using WebAPI_CodeMazeGuide.CustomInOutFormatters;
+using System.Collections.Generic;
 
 namespace WebAPI_CodeMazeGuide.Extensions
 {
@@ -79,6 +81,46 @@ namespace WebAPI_CodeMazeGuide.Extensions
             {
                 opt.OutputFormatters.Add(new CsvOutputFormatter());
             });
+
+        public static IServiceCollection ConfigureResponseCaching(this IServiceCollection services) =>
+            services.AddResponseCaching();
+
+        public static IServiceCollection ConfigureHtttpCachingHeaders(this IServiceCollection services) =>
+            services.AddHttpCacheHeaders(
+                expOpt =>
+                {
+                    expOpt.MaxAge = 69;
+                    expOpt.CacheLocation = Marvin.Cache.Headers.CacheLocation.Private;
+                },
+                validOpt => 
+                {
+                    validOpt.MustRevalidate = true;
+                });
+
+        public static IServiceCollection ConfigureRateLimitingOptions(this IServiceCollection services)
+        {
+            var rateLimitRules = new List<RateLimitRule>()
+            {
+                new ()
+                {
+                    Endpoint = "*",
+                    Limit = 5,
+                    Period = "5m"
+                }
+            };
+
+            services.Configure<IpRateLimitOptions>(opt => 
+            {
+                opt.GeneralRules = rateLimitRules;
+            });
+
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+
+            return services;
+        }
 
         public static IMvcBuilder AddCustomMediaTypes(this IMvcBuilder mvcBuilder)
         {
